@@ -1,5 +1,3 @@
-#Calculadora simple para sumar, restar, nuktiplicar y dividir.
-
 #Funciones de operaciones
 def suma(a,b):
     print(f"Resultado: {a+b}")
