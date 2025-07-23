@@ -2,7 +2,9 @@ import os
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
+from datetime import datetime
 
+fecha = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 carpeta = ""
 carpeta_destino = ""
 
@@ -43,9 +45,15 @@ def ejecutarOrden():
     if not carpeta_destino:
         messagebox.showwarning("Atención", "Primero selecciona una carpeta.")
         return
+    
+    # Se crea un txt de forma que se añade la info al final cada vez
+    log_path = os.path.abspath("log.txt")
+    log = open(log_path, "a", encoding="utf-8")
 
     for raiz, subcarpetas, archivos in os.walk(carpeta):
         for archivo in archivos:
+            if archivo == "log.txt":
+                continue
 
             # Construye la ruta completa del archivo
             ruta_archivo = os.path.join(raiz, archivo)
@@ -84,6 +92,13 @@ def ejecutarOrden():
 
                         # Mueve el archivo desde su ruta original a la nueva ruta
                         os.rename(ruta_archivo, nueva_ruta)
+
+                        # Para hacer el control del log
+                        fecha = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                        log.write(f"[{fecha}] {ruta_archivo} → {nueva_ruta}\n")
+
+
+
                         print(f"{nuevo_nombre} > {nueva_ruta}")
 
                         if tipo == "imagenes":
@@ -113,9 +128,15 @@ def ejecutarOrden():
                         contador+=1
 
                     os.rename(ruta_archivo, nueva_ruta)
+
+                    fecha = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                    log.write(f"[{fecha}] {ruta_archivo} → {nueva_ruta}\n")
+
                     print(f"{nuevo_nombre} > {nueva_ruta}")
                     
                     otros+=1
+
+    log.close()
 
     if imagenes != 0:
         print(f"Se han movido a la carpeta imagenes {imagenes} archivo/s.")
@@ -135,7 +156,33 @@ def ejecutarOrden():
     f"🗜️ Comprimidos: {comprimidos}\n"
     f"📦 Otros: {otros}")
 
-        
+def deshacer():
+# Leemos el log linea por linea de atras a delante        
+    with open("log.txt", "r", encoding="utf-8") as log:
+        lineas = log.readlines()
+
+        for linea in reversed(lineas):
+            #Elimina espacios y saltos de línea
+            linea = linea.strip()
+
+            if not linea:
+                continue
+            
+            #Elimina la parte de la fecha
+            try:
+                _, movimiento = linea.split("]", 1) #Divide en dos a partir de ]
+                ruta_origen, ruta_destino = [r.strip() for r in movimiento.split(" → ")]
+
+                if os.path.exists(ruta_destino):
+                    os.makedirs(os.path.dirname(ruta_origen), exist_ok=True)
+                    os.rename(ruta_destino, ruta_origen)
+                    print(f"Deshecho: {ruta_destino} → {ruta_origen}")
+
+                else: 
+                    print(f"Archivo no encontrado: {ruta_destino}")
+
+            except ValueError:
+                        print(f"Línea inválida en el log: {linea}")
 
 ventana = tk.Tk()
 ventana.title("Organizador de carpetas")
@@ -153,5 +200,8 @@ boton.pack(pady=20)
 
 etiqueta = tk.Label(ventana, text="No se ha seleccionado ninguna carpeta")
 etiqueta.pack()
+
+boton = tk.Button(ventana, text="Deshacer último movimiento", command=deshacer)
+boton.pack(pady=10)
 
 ventana.mainloop()
