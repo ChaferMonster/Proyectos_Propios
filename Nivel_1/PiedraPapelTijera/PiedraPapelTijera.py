@@ -6,18 +6,33 @@ from tkinter import messagebox
 eleccion_jugador = ""
 eleccion_bot = ""
 resultados = [" 🪨 Piedra", " 📄 Papel", " ✂️ Tijera"]
+jugadas_jugador = {" 🪨 Piedra":0, " 📄 Papel":0, " ✂️ Tijera":0}
 
 puntos_jugador = 0
 puntos_bot = 0
+
+ganar_a = {
+    " 🪨 Piedra": " 📄 Papel",
+    " 📄 Papel": " ✂️ Tijera",
+    " ✂️ Tijera": " 🪨 Piedra"
+}
+
 
 def toca_Piedra():
     global eleccion_jugador
     global eleccion_bot
     global puntos_jugador
     global puntos_bot
+    
 
     eleccion_jugador = " 🪨 Piedra"
-    eleccion_bot = random.choice(resultados)
+    jugadas_jugador[eleccion_jugador] +=1
+
+    if puntos_jugador == 0 and puntos_bot == 0:
+        eleccion_bot = random.choice(resultados)
+    else:
+        mas_comun = max(jugadas_jugador, key=jugadas_jugador.get)
+        eleccion_bot = ganar_a[mas_comun]
 
     if eleccion_bot == " 🪨 Piedra":
         texto = "¡Ha habido un empate!"
@@ -56,7 +71,13 @@ def toca_Papel():
     global puntos_bot
     
     eleccion_jugador = " 📄 Papel"
-    eleccion_bot = random.choice(resultados)
+    jugadas_jugador[eleccion_jugador] +=1
+
+    if puntos_jugador == 0 and puntos_bot == 0:
+        eleccion_bot = random.choice(resultados)
+    else:
+        mas_comun = max(jugadas_jugador, key=jugadas_jugador.get)
+        eleccion_bot = ganar_a[mas_comun]
 
     if eleccion_bot == " 📄 Papel":
         texto = "¡Ha habido un empate!"
@@ -95,7 +116,13 @@ def toca_Tijera():
     global puntos_bot
     
     eleccion_jugador = " ✂️ Tijera"
-    eleccion_bot = random.choice(resultados)
+    jugadas_jugador[eleccion_jugador] +=1
+
+    if puntos_jugador == 0 and puntos_bot == 0:
+        eleccion_bot = random.choice(resultados)
+    else:
+        mas_comun = max(jugadas_jugador, key=jugadas_jugador.get)
+        eleccion_bot = ganar_a[mas_comun]
 
     if eleccion_bot == " ✂️ Tijera":
         texto = "¡Ha habido un empate!"
