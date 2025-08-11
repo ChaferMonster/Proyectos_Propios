@@ -17,7 +17,7 @@ ganar_a = {
     " ✂️ Tijera": " 🪨 Piedra"
 }
 
-# --- Lógica del juego ---
+# --- LÓGICA DE JUEGO ---
 def jugar(eleccion):
     global eleccion_jugador, eleccion_bot, puntos_jugador, puntos_bot
     eleccion_jugador = eleccion
@@ -74,6 +74,12 @@ def jugar(eleccion):
     seleccion_bot.config(image=diccionario_imagenes[eleccion_bot])
     seleccion_bot.image = diccionario_imagenes[eleccion_bot]
 
+def parpadeo(widget, veces=4):
+    if veces > 0:
+        color = "#f4a261" if veces % 2 == 0 else "black"
+        widget.config(fg=color)
+        ventana.after(200, parpadeo, widget, veces - 1)
+
 # 📊 --- MARCADOR Y RESULTADOS ---
 def reiniciar_marcador():
     global puntos_bot, puntos_jugador, jugadas_jugador
@@ -87,6 +93,19 @@ def reiniciar_marcador():
     seleccion_jugador.config(image=img_vacia)
 
     seleccion_bot.config(image=img_vacia)
+
+    mensaje_reinicio = tk.Label(reinicio_frame, text="¡Nueva partida!", font=("Arial", 20, "bold"), bg="#d0f0c0", fg="#f4a261")
+    mensaje_reinicio.pack()
+    ventana.after(1500, mensaje_reinicio.destroy)
+
+    parpadeo(marcador)
+
+# --- FUNCIONES PARA RESALTAR BOTONES ---
+def hover_in(event):
+    event.widget.config(bg="#e0e0e0")
+
+def hover_out(event):
+    event.widget.config(bg="#80a070")
 
     
 
@@ -118,38 +137,50 @@ diccionario_imagenes = {
     " ✂️ Tijera":img_tijera
 }
 
+
+reinicio_frame = tk.Frame(ventana, bg="#d0f0c0")
+reinicio_frame.pack()
+
 # Marcador de la puntuación
-marcador = tk.Label(ventana, text="Marcador: ", font=("Helvetica", 14, "bold"), bg="#d0f0c0")
+marcador = tk.Label(ventana, text="Marcador: ", font=("Helvetica", 14, "bold"), bg="#d0f0c0", fg="#003300")
 marcador.pack(pady=10)
 
 #Conjunto de botones de opciones
-frame_botones = tk.Frame(ventana, bg="#d0f0c0")
+frame_botones = tk.Frame(ventana, bg="#a0c090")
 frame_botones.pack(pady=20)
 
-piedra = tk.Button(frame_botones, image=img_piedra,  font=("Helvetica", 14, "bold"), command=lambda: jugar(" 🪨 Piedra"), bg="#d0f0c0", fg="white", activebackground="#3e3e5f")
+piedra = tk.Button(frame_botones, image=img_piedra,  font=("Helvetica", 14, "bold"), command=lambda: jugar(" 🪨 Piedra"), bg="#80a070", fg="white", activebackground="#3e3e5f")
+piedra.bind("<Enter>", hover_in)
+piedra.bind("<Leave>", hover_out)
 piedra.pack(side="left", padx=10)
 
-papel = tk.Button(frame_botones, image=img_papel, width=100, height=100, font=("Helvetica", 14, "bold"), command=lambda: jugar(" 📄 Papel"), bg="#d0f0c0", fg="white", activebackground="#3e3e5f")
+papel = tk.Button(frame_botones, image=img_papel, width=100, height=100, font=("Helvetica", 14, "bold"), command=lambda: jugar(" 📄 Papel"), bg="#80a070", fg="white", activebackground="#3e3e5f")
+papel.bind("<Enter>", hover_in)
+papel.bind("<Leave>", hover_out)
 papel.pack(side="left", padx=10)
 
-tijera = tk.Button(frame_botones, image=img_tijera, width=100, height=100,font=("Helvetica", 14, "bold"), command=lambda: jugar(" ✂️ Tijera"), bg="#d0f0c0", fg="white", activebackground="#3e3e5f")
+tijera = tk.Button(frame_botones, image=img_tijera, width=100, height=100,font=("Helvetica", 14, "bold"), command=lambda: jugar(" ✂️ Tijera"), bg="#80a070", fg="white", activebackground="#3e3e5f")
+tijera.bind("<Enter>", hover_in)
+tijera.bind("<Leave>", hover_out)
 tijera.pack(side="left", padx=10)
 
 #Conjunto de imágenes de resultados
-frame_resultados = tk.Frame(ventana, bg="#d0f0c0")
+frame_resultados = tk.Frame(ventana, bg="#a0c090")
 frame_resultados.pack(pady=20)
 
-seleccion_jugador = tk.Label(frame_resultados, image=img_vacia, bg="#d0f0c0")
-seleccion_jugador.pack(side="left", padx=10)
+seleccion_jugador = tk.Label(frame_resultados, image=img_vacia, bg="#a0c090")
+seleccion_jugador.grid(row=0, column=0, pady=5, padx=10)
+tk.Label(frame_resultados, text="Jugador", font=("Arial", 14, "bold", ), bg="#a0c090").grid(row=1, column=0, pady=5)
 
 
-seleccion_bot = tk.Label(frame_resultados, image=img_vacia, bg="#d0f0c0")
-seleccion_bot.pack(side="left", padx=10)
+seleccion_bot = tk.Label(frame_resultados, image=img_vacia, bg="#a0c090")
+seleccion_bot.grid(row=0, column=1, pady=5, padx=10)
+tk.Label(frame_resultados, text="Bot", font=("Arial", 14, "bold"), bg="#a0c090").grid(row=1, column=1, pady=5)
 
-resultado = tk.Label(ventana, text=f"Resultado:\n\nElegiste: {eleccion_jugador}", font=("Helvetica", 11, ""), bg="#d0f0c0")
+resultado = tk.Label(ventana, text=f"Resultado:\n\nElegiste: {eleccion_jugador}", font=("Helvetica", 11, ""), bg="#d0f0c0", fg="#003300")
 resultado.pack(pady=10)
 
-reseteo = tk.Button(ventana, text="Reiniciar Marcador", command=reiniciar_marcador, font=("Helvetica", 14, "bold"), bg="#d0f0c0", fg="black", activebackground="#3e3e5f")
+reseteo = tk.Button(ventana, text="Reiniciar Marcador", command=reiniciar_marcador, font=("Helvetica", 14, "bold"), bg="#80a070", fg="#f4a261", activebackground="#3e3e5f")
 reseteo.pack(pady=10)
 
 if puntos_jugador == 5:
